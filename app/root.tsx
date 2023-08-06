@@ -1,5 +1,6 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type { LinksFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import type { LinksFunction, LoaderArgs } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -7,14 +8,25 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
   useRouteError,
 } from "@remix-run/react";
-import type { PropsWithChildren } from "react";
+import { type PropsWithChildren } from "react";
+import clsx from "clsx";
 
 import stylesheet from "~/tailwind.css";
+import { Navbar } from "./components/Navbar";
+import type { Theme } from "./components/contexts/ThemeContext";
+import {
+  NonFlashOfWrongTheme,
+  ThemeProvider,
+  useTheme,
+} from "./components/contexts/ThemeContext";
+import { getThemeSession } from "./utils/theme.server";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
+  { rel: "stylesheet", href: "https://rsms.me/inter/inter.css" },
   { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
   {
     rel: "icon",
@@ -32,21 +44,38 @@ export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
+export type LoaderData = {
+  theme: Theme | null;
+};
+
+export const loader = async ({ request }: LoaderArgs) => {
+  const themeSession = await getThemeSession(request);
+
+  return json({ theme: themeSession.getTheme() });
+};
+
 function Document({
   children,
   title = "Javier Moreno",
 }: PropsWithChildren<{ title?: string }>) {
+  const [theme] = useTheme();
+
   return (
-    <html lang="en" className="h-full bg-white">
+    <html lang="en" className={`h-full ${clsx(theme)}`}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <title>{title}</title>
         <Links />
+        <NonFlashOfWrongTheme ssrTheme={Boolean(theme)} />
       </head>
-      <body className="h-full">
-        {children}
+      <body className="h-full w-full bg-white p-10 transition duration-500 dark:bg-black">
+        <header>
+          <Navbar />
+        </header>
+        <main>{children}</main>
+        <footer></footer>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
@@ -56,10 +85,14 @@ function Document({
 }
 
 export default function App() {
+  const { theme } = useLoaderData<typeof loader>();
+
   return (
-    <Document>
-      <Outlet />
-    </Document>
+    <ThemeProvider specifiedTheme={theme}>
+      <Document>
+        <Outlet />
+      </Document>
+    </ThemeProvider>
   );
 }
 

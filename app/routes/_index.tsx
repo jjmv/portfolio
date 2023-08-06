@@ -3,9 +3,5 @@ import type { V2_MetaFunction } from "@remix-run/node";
 export const meta: V2_MetaFunction = () => [{ title: "Javier Moreno" }];
 
 export default function Index() {
-  return (
-    <main className="relative min-h-screen bg-white sm:flex sm:items-center sm:justify-center">
-      <h1>Personal Portfolio Javier Moreno</h1>
-    </main>
-  );
+  return <h1 className="text-primary">Personal Portfolio Javier Moreno</h1>;
 }
