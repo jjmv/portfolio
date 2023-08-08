@@ -70,7 +70,7 @@ function Document({
         <Links />
         <NonFlashOfWrongTheme ssrTheme={Boolean(theme)} />
       </head>
-      <body className="h-full w-full bg-white p-10 transition duration-500 dark:bg-black">
+      <body className="h-full w-full bg-white transition duration-500 dark:bg-black">
         <header>
           <Navbar />
         </header>
