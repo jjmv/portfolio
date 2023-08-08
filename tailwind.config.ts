@@ -11,7 +11,6 @@ export default {
         secondary: "hsl(178, 40%, 47%)",
         tertiary: "hsl(49, 43%, 48%)",
         white: "hsl(60, 100%, 99%)",
-        black: "hsl(229, 19%, 22%)",
       },
       fontFamily: {
         sans: ["Inter var", ...defaultTheme.fontFamily.sans],
